@@ -4,7 +4,7 @@ SUBSCRIPTION_ID = "message-subscription"
 TOPIC_ID = "message-topic"
 
 # MySQL Database Credentials
-DB_HOST = "your-mysql-server-host"  # Example: "localhost" or an IP address
-DB_USER = "your-username"
-DB_PASSWORD = "your-password"
-DB_NAME = "your-database-name"
+DB_HOST = "localhost"  # Example: "localhost" or an IP address
+DB_USER = "root"
+DB_PASSWORD = "lreinha1"
+DB_NAME = "my_database"
