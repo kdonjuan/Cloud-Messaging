@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Publisher UI</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        #message { width: 300px; padding: 8px; }
+        #publish { padding: 8px 12px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h2>Publish Message</h2>
+    <input type="text" id="message" placeholder="Enter message">
+    <button id="publish">Publish</button>
+    <p id="status"></p>
+
+    <script>
+        document.getElementById("publish").addEventListener("click", function() {
+            const message = document.getElementById("message").value;
+            if (!message) {
+                alert("Please enter a message");
+                return;
+            }
+            
+            fetch("http://localhost:5000/publish", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("status").textContent = data.status;
+            })
+            .catch(error => console.error("Error:", error));
+        });
+    </script>
+</body>
+</html>
