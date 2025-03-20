@@ -1,72 +1,194 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Consumer UI</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { cursor: pointer; }
-        #filter { margin-bottom: 10px; padding: 5px; }
-        .duplicate { background-color: #ffcccc; }
+        /* General Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7fa;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h2 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* Container */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Filter Input */
+        #filter {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border 0.3s ease;
+        }
+
+        #filter:focus {
+            border-color: #4caf50;
+        }
+
+        /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #4caf50;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        th:hover {
+            background-color: #45a049;
+        }
+
+        /* Row Styles */
+        tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* Duplicate Message Highlight */
+        .duplicate {
+            background-color: #ffdddd !important;
+        }
+
+        /* Button Styles */
+        button {
+            padding: 10px 20px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
+
 <body>
-    <h2>Received Messages</h2>
-    <input type="text" id="filter" placeholder="Filter messages" onkeyup="filterMessages()">
-    <table>
-        <thead>
-            <tr>
-                <th onclick="sortTable(0)">Message</th>
-                <th onclick="sortTable(1)">Timestamp</th>
-            </tr>
-        </thead>
-        <tbody id="messages"></tbody>
-    </table>
+    <div class="container">
+        <h2>📩 Received Messages</h2>
+        <input type="text" id="filter" placeholder="🔍 Filter messages by keyword" onkeyup="filterMessages()">
+        <table>
+            <thead>
+                <tr>
+                    <th onclick="sortTable(0)">📧 Message</th>
+                    <th onclick="sortTable(1)">⏰ Timestamp</th>
+                </tr>
+            </thead>
+            <tbody id="messages"></tbody>
+        </table>
+    </div>
 
     <script>
+        // Fetch messages from the backend
         function fetchMessages() {
             fetch("http://localhost:5000/messages")
                 .then(response => response.json())
                 .then(data => {
                     const tbody = document.getElementById("messages");
                     tbody.innerHTML = "";
-                    
+
                     const messageCount = {};
                     data.messages.forEach(msg => {
                         messageCount[msg.message] = (messageCount[msg.message] || 0) + 1;
                     });
-                    
+
                     data.messages.forEach(msg => {
                         const isDuplicate = messageCount[msg.message] > 1;
-                        const row = `<tr class="${isDuplicate ? 'duplicate' : ''}"><td>${msg.message}</td><td>${msg.timestamp}</td></tr>`;
+                        const row = `
+                            <tr class="${isDuplicate ? 'duplicate' : ''}">
+                                <td>${msg.message}</td>
+                                <td>${formatTimestamp(msg.timestamp)}</td>
+                            </tr>`;
                         tbody.innerHTML += row;
                     });
                 })
                 .catch(error => console.error("Error fetching messages:", error));
         }
-        
+
+        // Format timestamp for better readability
+        function formatTimestamp(timestamp) {
+            const date = new Date(timestamp);
+            return date.toLocaleString();
+        }
+
+        // Filter messages based on input value
         function filterMessages() {
             const filter = document.getElementById("filter").value.toLowerCase();
             document.querySelectorAll("tbody tr").forEach(row => {
                 row.style.display = row.innerText.toLowerCase().includes(filter) ? "" : "none";
             });
         }
-        
+
+        // Sort table by column
         function sortTable(n) {
             const table = document.querySelector("table");
             let rows = Array.from(table.rows).slice(1);
             const ascending = table.dataset.order !== "asc";
-            rows.sort((a, b) => a.cells[n].innerText.localeCompare(b.cells[n].innerText));
-            if (!ascending) rows.reverse();
+
+            rows.sort((a, b) => {
+                const valA = a.cells[n].innerText;
+                const valB = b.cells[n].innerText;
+                if (n === 1) {
+                    return ascending
+                        ? new Date(valA) - new Date(valB)
+                        : new Date(valB) - new Date(valA);
+                } else {
+                    return ascending
+                        ? valA.localeCompare(valB)
+                        : valB.localeCompare(valA);
+                }
+            });
+
             rows.forEach(row => table.appendChild(row));
             table.dataset.order = ascending ? "asc" : "desc";
         }
-        
+
+        // Fetch messages initially and refresh every 5 seconds
         fetchMessages();
-        setInterval(fetchMessages, 5000); // Auto-refresh every 5 seconds
+        setInterval(fetchMessages, 5000);
     </script>
 </body>
+
 </html>
