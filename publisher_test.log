@@ -1,0 +1,22 @@
+ERROR:root:Test Failed: Could not publish message. Error: 403 Caller does not have required permission to use project marine-actor-450915-b0. Grant the caller the roles/serviceusage.serviceUsageConsumer role, or a custom role with the serviceusage.services.use permission, by visiting https://console.developers.google.com/iam-admin/iam/project?project=marine-actor-450915-b0 and then retry. Propagation of the new permission may take a few minutes. [reason: "USER_PROJECT_DENIED"
+domain: "googleapis.com"
+metadata {
+  key: "consumer"
+  value: "projects/marine-actor-450915-b0"
+}
+metadata {
+  key: "containerInfo"
+  value: "marine-actor-450915-b0"
+}
+metadata {
+  key: "service"
+  value: "pubsub.googleapis.com"
+}
+, locale: "en-US"
+message: "Caller does not have required permission to use project marine-actor-450915-b0. Grant the caller the roles/serviceusage.serviceUsageConsumer role, or a custom role with the serviceusage.services.use permission, by visiting https://console.developers.google.com/iam-admin/iam/project?project=marine-actor-450915-b0 and then retry. Propagation of the new permission may take a few minutes."
+, links {
+  description: "Google developer console IAM admin"
+  url: "https://console.developers.google.com/iam-admin/iam/project?project=marine-actor-450915-b0"
+}
+]
+ERROR:root:Test Failed: Could not publish message. Error: 404 Requested project not found or user does not have access to it (project=your-gcp-project-id). Make sure to specify the unique project identifier and not the Google Cloud Console display name.
