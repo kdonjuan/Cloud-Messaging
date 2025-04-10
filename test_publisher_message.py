@@ -10,7 +10,7 @@ logging.basicConfig(filename='publisher_test.log', level=logging.INFO)
 # os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'path/to/your/service-account-key.json'
 
 # Define project ID and topic name
-project_id = "your-gcp-project-id"
+project_id = "marine-actor-450915-b0"
 topic_id = "message-topic"
 
 # Construct message data
