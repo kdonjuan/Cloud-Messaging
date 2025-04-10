@@ -3,8 +3,7 @@ PROJECT_ID = "marine-actor-450915-b0"
 SUBSCRIPTION_ID = "message-subscription"
 TOPIC_ID = "message-topic"
 
-# MySQL Database Credentials
-DB_HOST = "localhost"  # Example: "localhost" or an IP address
-DB_USER = "root"
-DB_PASSWORD = "lreinha1"
-DB_NAME = "my_database"
+INSTANCE_CONNECTION_NAME = "marine-actor-450915-b0:us-central1:is-capstone"
+DB_NAME = "is-capstone"
+DB_USER = "test_user1"
+DB_PASSWORD = "is-capstone"
