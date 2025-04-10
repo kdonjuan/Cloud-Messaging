@@ -20,3 +20,5 @@ message: "Caller does not have required permission to use project marine-actor-4
 }
 ]
 ERROR:root:Test Failed: Could not publish message. Error: 404 Requested project not found or user does not have access to it (project=your-gcp-project-id). Make sure to specify the unique project identifier and not the Google Cloud Console display name.
+ERROR:root:Test Failed: Could not publish message. Error: 404 Requested project not found or user does not have access to it (project=your-gcp-project-id). Make sure to specify the unique project identifier and not the Google Cloud Console display name.
+INFO:root:Message published successfully. Message ID: 14348321072100677
