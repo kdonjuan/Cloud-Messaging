@@ -1,44 +1,68 @@
+# subscription.py
+
 from google.cloud import pubsub_v1
 import json
-import mysql.connector  # MySQL Connector
-from config import PROJECT_ID, SUBSCRIPTION_ID, DB_HOST, DB_USER, DB_PASSWORD, DB_NAME
+import logging
+from db_config import get_db_connection
+from config import PROJECT_ID, SUBSCRIPTION_ID
 
-# Connect to MySQL database
-conn = mysql.connector.connect(
-    host=DB_HOST,
-    user=DB_USER,
-    password=DB_PASSWORD,
-    database=DB_NAME
+# Set up logging
+logging.basicConfig(
+    filename='subscriber.log',
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
 )
+
+# Connect to Cloud SQL
+conn = get_db_connection()
 cursor = conn.cursor()
 
-# Function to check for duplicates
 def is_duplicate(message_id):
     cursor.execute("SELECT COUNT(*) FROM messages WHERE message_id = %s", (message_id,))
     return cursor.fetchone()[0] > 0
 
-# Function to process messages
 def callback(message):
-    data = json.loads(message.data.decode("utf-8"))
-    message_id = data.get("TransactionNumber")
+    try:
+        data = json.loads(message.data.decode("utf-8"))
+        message_id = data.get("TransactionNumber")
+        content = json.dumps(data)
+        status = data.get("Status", "UNKNOWN")
+        timestamp = data.get("TransactionDateTime", None)
 
-    if not is_duplicate(message_id):
-        cursor.execute(
-            "INSERT INTO messages (message_id, content) VALUES (%s, %s)",
-            (message_id, json.dumps(data))
-        )
-        conn.commit()
-        message.ack()  # Acknowledge message so it's removed from queue
-        print(f"Processed message: {message_id}")
-    else:
-        print(f"Duplicate message detected: {message_id}")
-        message.ack()  # Acknowledge but don’t store duplicate
+        if not message_id:
+            logging.warning("Message skipped due to missing TransactionNumber")
+            message.ack()
+            return
 
-# Start subscriber
+        if not is_duplicate(message_id):
+            cursor.execute(
+                "INSERT INTO messages (message_id, item_id, location, quantity, status, transaction_datetime, content, is_duplicate) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+                (
+                    message_id,
+                    data.get("ItemId"),
+                    data.get("Location"),
+                    data.get("Quantity"),
+                    status,
+                    timestamp,
+                    content,
+                    False
+                )
+            )
+            conn.commit()
+            logging.info(f"Message stored: {message_id}")
+        else:
+            logging.info(f"Duplicate message skipped: {message_id}")
+
+        message.ack()
+
+    except Exception as e:
+        logging.error(f"Error processing message: {e}")
+        message.ack()
+
 subscriber = pubsub_v1.SubscriberClient()
 subscription_path = subscriber.subscription_path(PROJECT_ID, SUBSCRIPTION_ID)
 subscriber.subscribe(subscription_path, callback=callback)
 
-print("Listening for messages...")
+logging.info("Subscriber is listening for messages.")
 while True:
-    pass  # Keeps the script running
+    pass
