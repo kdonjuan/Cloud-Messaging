@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Publisher UI</title>
     <style>
         * {
@@ -66,7 +66,6 @@
 
         #status {
             margin-top: 1rem;
-            color: #28a745;
             font-weight: bold;
         }
     </style>
@@ -80,5 +79,34 @@
     </div>
 
     <script>
-        document.getElementById("publish").addEventListener("click", function() {
-            const message = document.get
+        document.getElementById("publish").addEventListener("click", async function () {
+            const message = document.getElementById("message").value;
+            const status = document.getElementById("status");
+
+            if (!message.trim()) {
+                status.textContent = "Please enter a message.";
+                status.style.color = "red";
+                return;
+            }
+
+            try {
+                const response = await fetch("http://localhost:5000/publish", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ message: message })
+                });
+
+                const result = await response.json();
+                status.textContent = result.status || "Message published!";
+                status.style.color = "green";
+            } catch (error) {
+                console.error("Error:", error);
+                status.textContent = "Failed to publish message.";
+                status.style.color = "red";
+            }
+        });
+    </script>
+</body>
+</html>
