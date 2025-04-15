@@ -130,6 +130,47 @@
     </table>
   </div>
 
-  <script src="script.js"></script>
+  <script>
+    async function fetchMessages() {
+      try {
+        const response = await fetch('/api/messages');
+        const messages = await response.json();
+
+        const table = document.getElementById("messagesTable");
+        table.innerHTML = "";
+
+        messages.forEach(message => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${message.item_id || ""}</td>
+            <td>${message.location || ""}</td>
+            <td>${message.quantity || ""}</td>
+            <td>${message.transaction_time || ""}</td>
+            <td>${message.transaction_number || ""}</td>
+          `;
+          table.appendChild(row);
+        });
+
+        filterMessages(); // Optional: reapply filter after refresh
+      } catch (error) {
+        console.error("Error fetching messages:", error);
+      }
+    }
+
+    function filterMessages() {
+      const input = document.getElementById("filterInput").value.toLowerCase();
+      const rows = document.getElementById("messagesTable").getElementsByTagName("tr");
+
+      for (let row of rows) {
+        const itemIdCell = row.cells[0];
+        const text = itemIdCell?.textContent.toLowerCase() || "";
+        row.style.display = text.includes(input) ? "" : "none";
+      }
+    }
+
+    // Fetch messages immediately and refresh every 5 seconds
+    fetchMessages();
+    setInterval(fetchMessages, 5000);
+  </script>
 </body>
 </html>
