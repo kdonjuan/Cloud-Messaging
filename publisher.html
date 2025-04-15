@@ -73,7 +73,7 @@
 </head>
 <body>
     <div class="container">
-        <h2>📤 Publish a Message</h2>
+        <h2>Publish a Message</h2>
         <input type="text" id="message" placeholder="Enter your message here">
         <button id="publish">Publish</button>
         <p id="status"></p>
@@ -98,7 +98,7 @@
             })
             .catch(error => {
                 console.error("Error:", error);
-                document.getElementById("status").textContent = "❌ Failed to publish message.";
+                document.getElementById("status").textContent = "Failed to publish message.";
                 document.getElementById("status").style.color = "red";
             });
         });
