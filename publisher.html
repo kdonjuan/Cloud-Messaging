@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Publisher UI</title>
     <style>
         * {
@@ -66,41 +66,46 @@
 
         #status {
             margin-top: 1rem;
-            color: #28a745;
             font-weight: bold;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>📤 Publish a Message</h2>
+        <h2>Publish a Message</h2>
         <input type="text" id="message" placeholder="Enter your message here">
         <button id="publish">Publish</button>
         <p id="status"></p>
     </div>
 
     <script>
-        document.getElementById("publish").addEventListener("click", function() {
+        document.getElementById("publish").addEventListener("click", async function () {
             const message = document.getElementById("message").value;
-            if (!message) {
-                alert("Please enter a message");
+            const status = document.getElementById("status");
+
+            if (!message.trim()) {
+                status.textContent = "Please enter a message.";
+                status.style.color = "red";
                 return;
             }
 
-            fetch("http://localhost:5000/publish", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message })
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById("status").textContent = data.status;
-            })
-            .catch(error => {
+            try {
+                const response = await fetch("http://localhost:5000/publish", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ message: message })
+                });
+
+                const result = await response.json();
+                status.textContent = result.status || "Message published!";
+                status.style.color = "green";
+            } catch (error) {
                 console.error("Error:", error);
-                document.getElementById("status").textContent = "❌ Failed to publish message.";
-                document.getElementById("status").style.color = "red";
-            });
+                status.textContent = "Failed to publish message.";
+                status.style.color = "red";
+            }
         });
     </script>
 </body>
