@@ -2,11 +2,11 @@ import pymysql
 
 def get_db_connection():
     conn = pymysql.connect(
-        host="130.218.6.188",
+        host="35.231.173.84",
         user="test_user1",
         password="is-capstone",
-        db="is-capstone",
-        connect_timeout=5,  # add this line
+        db="iscapstone_db",
+        connect_timeout=5,
         cursorclass=pymysql.cursors.DictCursor
     )
     return conn
