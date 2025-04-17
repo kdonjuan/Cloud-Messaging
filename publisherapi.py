@@ -4,7 +4,10 @@ from google.oauth2 import service_account
 import json
 import logging
 from db_config import get_db_connection
-from config import PROJECT_ID, TOPIC_ID, GOOGLE_APPLICATION_CREDENTIALS
+from config import PROJECT_ID, TOPIC_ID
+import os
+
+GOOGLE_APPLICATION_CREDENTIALS = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
 
 
 # Set up logging
