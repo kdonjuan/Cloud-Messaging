@@ -39,6 +39,7 @@
 2025-04-17 18:40:27,977 - INFO -  * Restarting with stat
 2025-04-17 18:40:29,981 - WARNING -  * Debugger is active!
 2025-04-17 18:40:30,030 - INFO -  * Debugger PIN: 132-524-547
+<<<<<<< Updated upstream
 2025-04-17 18:46:20,642 - WARNING -  * Debugger is active!
 2025-04-17 18:46:20,667 - INFO -  * Debugger PIN: 943-607-867
 2025-04-17 18:48:21,061 - INFO - 127.0.0.1 - - [17/Apr/2025 18:48:21] "OPTIONS /publish HTTP/1.1" 200 -
@@ -139,3 +140,7 @@
 2025-04-17 19:21:37,780 - INFO - 127.0.0.1 - - [17/Apr/2025 19:21:37] "[33mGET / HTTP/1.1[0m" 404 -
 2025-04-17 19:23:00,229 - INFO -  * Detected change in '/Users/lane/Documents/GitHub/IS_Capstone/publisherapi.py', reloading
 2025-04-17 19:23:03,386 - INFO -  * Restarting with watchdog (fsevents)
+=======
+2025-04-17 19:13:53,146 - INFO - Retrieved messages from database.
+2025-04-17 19:13:53,158 - INFO - 127.0.0.1 - - [17/Apr/2025 19:13:53] "GET /messages HTTP/1.1" 200 -
+>>>>>>> Stashed changes
