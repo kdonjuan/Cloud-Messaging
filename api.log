@@ -1,0 +1,23 @@
+2025-04-17 17:28:55,620 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://10.200.138.70:5001
+2025-04-17 17:28:55,621 - INFO - [33mPress CTRL+C to quit[0m
+2025-04-17 17:28:55,623 - INFO -  * Restarting with stat
+2025-04-17 17:28:56,350 - WARNING -  * Debugger is active!
+2025-04-17 17:28:56,388 - INFO -  * Debugger PIN: 132-524-547
+2025-04-17 17:32:31,687 - ERROR - Error retrieving messages: Connection.cursor() got an unexpected keyword argument 'dictionary'
+2025-04-17 17:32:31,691 - INFO - 127.0.0.1 - - [17/Apr/2025 17:32:31] "[35m[1mGET /messages HTTP/1.1[0m" 500 -
+2025-04-17 17:35:07,311 - ERROR - Error retrieving messages: Connection.cursor() got an unexpected keyword argument 'dictionary'
+2025-04-17 17:35:07,315 - INFO - 127.0.0.1 - - [17/Apr/2025 17:35:07] "[35m[1mGET /messages HTTP/1.1[0m" 500 -
+2025-04-17 17:35:07,556 - INFO - 127.0.0.1 - - [17/Apr/2025 17:35:07] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-04-17 17:35:38,956 - ERROR - Error retrieving messages: Connection.cursor() got an unexpected keyword argument 'dictionary'
+2025-04-17 17:35:38,959 - INFO - 127.0.0.1 - - [17/Apr/2025 17:35:38] "[35m[1mGET /messages HTTP/1.1[0m" 500 -
+2025-04-17 17:44:38,985 - INFO -  * Detected change in '/Users/remarihudson/Documents/GitHub/Cloud-Messaging/publisherapi.py', reloading
+2025-04-17 17:44:41,271 - INFO -  * Restarting with stat
+2025-04-17 17:44:43,007 - WARNING -  * Debugger is active!
+2025-04-17 17:44:43,022 - INFO -  * Debugger PIN: 132-524-547
+2025-04-17 17:45:06,765 - INFO - Retrieved messages from database.
+2025-04-17 17:45:06,766 - INFO - 127.0.0.1 - - [17/Apr/2025 17:45:06] "GET /messages HTTP/1.1" 200 -
+2025-04-17 17:46:05,554 - INFO -  * Detected change in '/Users/remarihudson/Documents/GitHub/Cloud-Messaging/config.py', reloading
+2025-04-17 17:46:08,260 - INFO -  * Restarting with stat

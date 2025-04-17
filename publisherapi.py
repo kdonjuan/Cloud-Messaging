@@ -16,6 +16,7 @@ logging.basicConfig(
 
 app = Flask(__name__)
 
+# Initialize Pub/Sub
 credentials = service_account.Credentials.from_service_account_file(GOOGLE_APPLICATION_CREDENTIALS)
 publisher = pubsub_v1.PublisherClient(credentials=credentials)
 topic_path = publisher.topic_path(PROJECT_ID, TOPIC_ID)
@@ -43,25 +44,27 @@ def publish_message():
 def get_messages():
     try:
         conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
+        cursor = conn.cursor()
         cursor.execute("""
             SELECT message_id, item_id, location, quantity, status, transaction_datetime, is_duplicate, created_at
             FROM messages
             ORDER BY created_at DESC
         """)
         rows = cursor.fetchall()
+        columns = [desc[0] for desc in cursor.description]
 
         messages = []
         for row in rows:
+            row_dict = dict(zip(columns, row))
             messages.append({
-                "TransactionNumber": row["message_id"],
-                "ItemID": row["item_id"],
-                "Location": row["location"],
-                "Quantity": row["quantity"],
-                "Status": row["status"],
-                "TransactionDateTime": row["transaction_datetime"].isoformat() if row["transaction_datetime"] else None,
-                "isDuplicate": row["is_duplicate"],
-                "ReceivedAt": row["created_at"].isoformat()
+                "TransactionNumber": row_dict["message_id"],
+                "ItemID": row_dict["item_id"],
+                "Location": row_dict["location"],
+                "Quantity": row_dict["quantity"],
+                "Status": row_dict["status"],
+                "TransactionDateTime": row_dict["transaction_datetime"].isoformat() if row_dict["transaction_datetime"] else None,
+                "isDuplicate": row_dict["is_duplicate"],
+                "ReceivedAt": row_dict["created_at"].isoformat()
             })
 
         logging.info("Retrieved messages from database.")
