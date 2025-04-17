@@ -197,3 +197,4 @@ Traceback (most recent call last):
   File "/opt/anaconda3/lib/python3.12/site-packages/pymysql/connections.py", line 843, in _execute_command
     raise err.InterfaceError(0, "")
 pymysql.err.InterfaceError: (0, '')
+2025-04-17 17:56:05,956 - INFO - Subscriber is listening for messages.
