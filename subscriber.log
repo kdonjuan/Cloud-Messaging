@@ -198,3 +198,7 @@ Traceback (most recent call last):
     raise err.InterfaceError(0, "")
 pymysql.err.InterfaceError: (0, '')
 2025-04-17 17:56:05,956 - INFO - Subscriber is listening for messages.
+2025-04-17 18:15:07,862 - INFO - Subscriber is listening for messages.
+2025-04-17 18:17:24,957 - INFO - Subscriber is listening for messages.
+2025-04-17 18:18:37,704 - INFO - Subscriber is listening for messages.
+2025-04-17 18:19:21,706 - INFO - Subscriber is listening for messages.
