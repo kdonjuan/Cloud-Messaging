@@ -46,7 +46,7 @@ function displayMessages(messages) {
             <td>${msg.Location}</td>
             <td>${msg.Quantity}</td>
             <td>${msg.TransactionDateTime}</td>
-            <td>${msg.TransactionNumber}</td>
+            <td>${msg.message_id}</td>
         `;
 
         tableBody.appendChild(row);
