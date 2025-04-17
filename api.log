@@ -19,3 +19,5 @@
 2025-04-17 17:44:43,022 - INFO -  * Debugger PIN: 132-524-547
 2025-04-17 17:45:06,765 - INFO - Retrieved messages from database.
 2025-04-17 17:45:06,766 - INFO - 127.0.0.1 - - [17/Apr/2025 17:45:06] "GET /messages HTTP/1.1" 200 -
+2025-04-17 17:46:05,554 - INFO -  * Detected change in '/Users/remarihudson/Documents/GitHub/Cloud-Messaging/config.py', reloading
+2025-04-17 17:46:08,260 - INFO -  * Restarting with stat
