@@ -55,9 +55,10 @@ def callback(message):
 
         message.ack()
 
-    except Exception as e:
-        logging.error(f"Error processing message: {e}")
+    except Exception:
+        logging.exception("Error processing message")
         message.ack()
+
 
 subscriber = pubsub_v1.SubscriberClient()
 subscription_path = subscriber.subscription_path(PROJECT_ID, SUBSCRIPTION_ID)

@@ -1,0 +1,16 @@
+2025-04-16 23:40:57,821 - INFO - Subscriber is listening for messages.
+2025-04-16 23:42:01,682 - ERROR - Error processing message
+Traceback (most recent call last):
+  File "/Users/lane/Documents/GitHub/IS_Capstone/subscription.py", line 26, in callback
+    data = json.loads(message.data.decode("utf-8"))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-04-16 23:51:31,216 - INFO - Subscriber is listening for messages.
