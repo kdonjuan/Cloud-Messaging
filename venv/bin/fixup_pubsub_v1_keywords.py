@@ -1,6 +1,6 @@
-#!/Users/karendonjuan/Documents/Cloud-Messaging/venv/bin/python3.12
+#!/Users/karendonjuan/Desktop/Cloud-Messaging/venv/bin/python3.12
 # -*- coding: utf-8 -*-
-# Copyright 2024 Google LLC
+# Copyright 2025 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -74,9 +74,6 @@ class pubsubCallTransformer(cst.CSTTransformer):
         'update_topic': ('topic', 'update_mask', ),
         'validate_message': ('parent', 'name', 'schema', 'message', 'encoding', ),
         'validate_schema': ('parent', 'schema', ),
-    'get_iam_policy': ('resource', 'options', ),
-    'set_iam_policy': ('resource', 'policy', ),
-    'test_iam_permissions': ('resource', 'permissions', ),
     }
 
     def leave_Call(self, original: cst.Call, updated: cst.Call) -> cst.CSTNode:

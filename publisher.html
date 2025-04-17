@@ -1,39 +1,111 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Publisher UI</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        #message { width: 300px; padding: 8px; }
-        #publish { padding: 8px 12px; cursor: pointer; }
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5ef9b;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 1.5rem;
+            color: #333;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px 14px;
+            margin-bottom: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border 0.2s;
+        }
+
+        input[type="text"]:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #status {
+            margin-top: 1rem;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
-    <h2>Publish Message</h2>
-    <input type="text" id="message" placeholder="Enter message">
-    <button id="publish">Publish</button>
-    <p id="status"></p>
+    <div class="container">
+        <h2>Publish a Message</h2>
+        <input type="text" id="message" placeholder="Enter your message here">
+        <button id="publish">Publish</button>
+        <p id="status"></p>
+    </div>
 
     <script>
-        document.getElementById("publish").addEventListener("click", function() {
+        document.getElementById("publish").addEventListener("click", async function () {
             const message = document.getElementById("message").value;
-            if (!message) {
-                alert("Please enter a message");
+            const status = document.getElementById("status");
+
+            if (!message.trim()) {
+                status.textContent = "Please enter a message.";
+                status.style.color = "red";
                 return;
             }
-            
-            fetch("http://localhost:5000/publish", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message })
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById("status").textContent = data.status;
-            })
-            .catch(error => console.error("Error:", error));
+
+            try {
+                const response = await fetch("http://localhost:5000/publish", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ message: message })
+                });
+
+                const result = await response.json();
+                status.textContent = result.status || "Message published!";
+                status.style.color = "green";
+            } catch (error) {
+                console.error("Error:", error);
+                status.textContent = "Failed to publish message.";
+                status.style.color = "red";
+            }
         });
     </script>
 </body>

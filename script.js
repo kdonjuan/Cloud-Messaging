@@ -1,6 +1,6 @@
-const API_BASE_URL = "https://your-api-endpoint"; // Replace with your actual backend URL
+const API_BASE_URL = "http://localhost:5001"; // Update if deployed elsewhere
 
-// Function to publish a message
+// Function to publish a message (if needed)
 function publishMessage() {
     const message = document.getElementById("messageInput").value;
     if (!message.trim()) {
@@ -38,7 +38,7 @@ function displayMessages(messages) {
     messages.forEach(msg => {
         const row = document.createElement("tr");
         if (msg.isDuplicate) {
-            row.classList.add("highlight"); // Highlight duplicates
+            row.classList.add("highlight");
         }
 
         row.innerHTML = `
@@ -51,20 +51,6 @@ function displayMessages(messages) {
 
         tableBody.appendChild(row);
     });
-}
-
-// Function to sort messages by column
-function sortMessages(column) {
-    const tableBody = document.getElementById("messagesTable");
-    let rows = Array.from(tableBody.rows);
-
-    rows.sort((a, b) => {
-        let valA = a.cells[column === "ItemID" ? 0 : 3].innerText;
-        let valB = b.cells[column === "ItemID" ? 0 : 3].innerText;
-        return valA.localeCompare(valB);
-    });
-
-    rows.forEach(row => tableBody.appendChild(row));
 }
 
 // Function to filter messages by Item ID

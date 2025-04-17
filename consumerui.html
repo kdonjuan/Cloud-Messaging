@@ -1,194 +1,176 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Consumer UI</title>
-    <style>
-        /* General Styles */
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f4f7fa;
-            margin: 0;
-            padding: 20px;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Consumer UI</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f5ef9b;
+      margin: 0;
+      padding: 20px;
+    }
 
-        h2 {
-            color: #333;
-            text-align: center;
-            margin-bottom: 20px;
-        }
+    h2 {
+      color: #333;
+      text-align: center;
+      margin-bottom: 20px;
+    }
 
-        /* Container */
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
 
-        /* Filter Input */
-        #filter {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 20px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            font-size: 14px;
-            outline: none;
-            transition: border 0.3s ease;
-        }
+    .filter-wrapper {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
 
-        #filter:focus {
-            border-color: #4caf50;
-        }
+    .filter-box {
+      position: relative;
+      width: 80%;
+      max-width: 400px;
+    }
 
-        /* Table Styles */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            background-color: #fff;
-            border-radius: 8px;
-            overflow: hidden;
-        }
+    .filter-box input {
+      width: 100%;
+      padding: 12px 40px 12px 40px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+      transition: border 0.3s ease;
+    }
 
-        th,
-        td {
-            border: 1px solid #ddd;
-            padding: 12px;
-            text-align: left;
-        }
+    .filter-box input:focus {
+      border-color: #4caf50;
+    }
 
-        th {
-            background-color: #4c9daf;
-            color: #fff;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
+    .filter-box i {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #888;
+      pointer-events: none;
+    }
 
-        th:hover {
-            background-color: #4c9daf;
-        }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background-color: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+    }
 
-        /* Row Styles */
-        tbody tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: left;
+    }
 
-        tbody tr:hover {
-            background-color: #f1f1f1;
-        }
+    th {
+      background-color: #94c0e4;
+      color: #fff;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
 
-        /* Duplicate Message Highlight */
-        .duplicate {
-            background-color: #ffdddd !important;
-        }
+    th:hover {
+      background-color: #4c9daf;
+    }
 
-        /* Button Styles */
-        button {
-            padding: 10px 20px;
-            background-color: #4caf50;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
+    tbody tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
 
-        button:hover {
-            background-color: #45a049;
-        }
-    </style>
+    tbody tr:hover {
+      background-color: #f1f1f1;
+    }
+
+    .highlight {
+      background-color: #ffdddd !important;
+    }
+  </style>
+
+  <!-- Font Awesome for search icon -->
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
 
 <body>
-    <div class="container">
-        <h2>📩 Received Messages</h2>
-        <input type="text" id="filter" placeholder="🔍 Filter messages by keyword" onkeyup="filterMessages()">
-        <table>
-            <thead>
-                <tr>
-                    <th onclick="sortTable(0)">📧 Message</th>
-                    <th onclick="sortTable(1)">⏰ Timestamp</th>
-                </tr>
-            </thead>
-            <tbody id="messages"></tbody>
-        </table>
+  <div class="container">
+    <h2>Received Messages</h2>
+
+    <div class="filter-wrapper">
+      <div class="filter-box">
+        <i class="fas fa-search"></i>
+        <input type="text" id="filterInput" placeholder="Filter by Item ID" onkeyup="filterMessages()" />
+      </div>
     </div>
 
-    <script>
-        // Fetch messages from the backend
-        function fetchMessages() {
-            fetch("http://localhost:5000/messages")
-                .then(response => response.json())
-                .then(data => {
-                    const tbody = document.getElementById("messages");
-                    tbody.innerHTML = "";
+    <table>
+      <thead>
+        <tr>
+          <th>Item ID</th>
+          <th>Location</th>
+          <th>Quantity</th>
+          <th>Transaction Date/Time</th>
+          <th>Transaction Number</th>
+        </tr>
+      </thead>
+      <tbody id="messagesTable"></tbody>
+    </table>
+  </div>
 
-                    const messageCount = {};
-                    data.messages.forEach(msg => {
-                        messageCount[msg.message] = (messageCount[msg.message] || 0) + 1;
-                    });
+  <script>
+    async function fetchMessages() {
+      try {
+        const response = await fetch('/api/messages');
+        const messages = await response.json();
 
-                    data.messages.forEach(msg => {
-                        const isDuplicate = messageCount[msg.message] > 1;
-                        const row = `
-                            <tr class="${isDuplicate ? 'duplicate' : ''}">
-                                <td>${msg.message}</td>
-                                <td>${formatTimestamp(msg.timestamp)}</td>
-                            </tr>`;
-                        tbody.innerHTML += row;
-                    });
-                })
-                .catch(error => console.error("Error fetching messages:", error));
-        }
+        const table = document.getElementById("messagesTable");
+        table.innerHTML = "";
 
-        // Format timestamp for better readability
-        function formatTimestamp(timestamp) {
-            const date = new Date(timestamp);
-            return date.toLocaleString();
-        }
+        messages.forEach(message => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${message.item_id || ""}</td>
+            <td>${message.location || ""}</td>
+            <td>${message.quantity || ""}</td>
+            <td>${message.transaction_time || ""}</td>
+            <td>${message.transaction_number || ""}</td>
+          `;
+          table.appendChild(row);
+        });
 
-        // Filter messages based on input value
-        function filterMessages() {
-            const filter = document.getElementById("filter").value.toLowerCase();
-            document.querySelectorAll("tbody tr").forEach(row => {
-                row.style.display = row.innerText.toLowerCase().includes(filter) ? "" : "none";
-            });
-        }
+        filterMessages(); // Optional: reapply filter after refresh
+      } catch (error) {
+        console.error("Error fetching messages:", error);
+      }
+    }
 
-        // Sort table by column
-        function sortTable(n) {
-            const table = document.querySelector("table");
-            let rows = Array.from(table.rows).slice(1);
-            const ascending = table.dataset.order !== "asc";
+    function filterMessages() {
+      const input = document.getElementById("filterInput").value.toLowerCase();
+      const rows = document.getElementById("messagesTable").getElementsByTagName("tr");
 
-            rows.sort((a, b) => {
-                const valA = a.cells[n].innerText;
-                const valB = b.cells[n].innerText;
-                if (n === 1) {
-                    return ascending
-                        ? new Date(valA) - new Date(valB)
-                        : new Date(valB) - new Date(valA);
-                } else {
-                    return ascending
-                        ? valA.localeCompare(valB)
-                        : valB.localeCompare(valA);
-                }
-            });
+      for (let row of rows) {
+        const itemIdCell = row.cells[0];
+        const text = itemIdCell?.textContent.toLowerCase() || "";
+        row.style.display = text.includes(input) ? "" : "none";
+      }
+    }
 
-            rows.forEach(row => table.appendChild(row));
-            table.dataset.order = ascending ? "asc" : "desc";
-        }
-
-        // Fetch messages initially and refresh every 5 seconds
-        fetchMessages();
-        setInterval(fetchMessages, 5000);
-    </script>
+    // Fetch messages immediately and refresh every 5 seconds
+    fetchMessages();
+    setInterval(fetchMessages, 5000);
+  </script>
 </body>
-
 </html>
