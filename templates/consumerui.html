@@ -183,6 +183,17 @@
         const aVal = getCellValue(a, sortColumn);
         const bVal = getCellValue(b, sortColumn);
  
+        // 🔧 Fix sorting for ItemID: sort by the number after "ITEM-"
+        if (sortColumn === 0) {
+          const getNumber = val => {
+            const match = val.match(/-(\d+)/);
+            return match ? parseInt(match[1]) : 0;
+          };
+          return sortDirection === 'asc'
+            ? getNumber(aVal) - getNumber(bVal)
+            : getNumber(bVal) - getNumber(aVal);
+        }
+ 
         if (sortColumn === 2) {
           return sortDirection === 'asc' ? parseFloat(aVal) - parseFloat(bVal) : parseFloat(bVal) - parseFloat(aVal);
         }
@@ -254,4 +265,3 @@
 </script>
 </body>
 </html>
- 
