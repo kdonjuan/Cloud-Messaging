@@ -116,7 +116,7 @@
 <div class="container">
 <h2>Received Messages</h2>
  
-    <div class="filter-wrapper">
+  <div class="filter-wrapper">
 <select id="filterColumn" onchange="renderMessages()">
 <option value="0">Item ID</option>
 <option value="1">Location</option>
@@ -125,20 +125,18 @@
 <option value="4">Transaction Number</option>
 </select>
  
-      <input type="text" id="filterInput" placeholder="Type to filter..." onkeyup="renderMessages()" />
+    <input type="text" id="filterInput" placeholder="Type to filter..." onkeyup="renderMessages()" />
  
-      <select id="duplicateFilter" onchange="renderMessages()">
+    <select id="duplicateFilter" onchange="renderMessages()">
 <option value="all">Show All</option>
 <option value="originals">Only Originals</option>
 <option value="duplicates">Only Duplicates</option>
 </select>
  
-      <button onclick="sortByTime('newest')">Newest First</button>
-<button onclick="sortByTime('oldest')">Oldest First</button>
-<button onclick="clearSort()">Clear Sort</button>
+    <button onclick="clearSort()">Clear Sort</button>
 </div>
  
-    <table>
+  <table>
 <thead>
 <tr>
 <th onclick="toggleSort(0)">Item ID</th>
@@ -152,113 +150,108 @@
 </table>
 </div>
  
-  <script>
-    let messages = [];
-    let sortColumn = null;
-    let sortDirection = null;
+<script>
+  let messages = [];
+  let sortColumn = null;
+  let sortDirection = null;
  
-    async function fetchMessages() {
-      try {
-        const response = await fetch("http://localhost:5001/messages");
-        messages = await response.json();
-        renderMessages();
-      } catch (error) {
-        console.error("Error fetching messages:", error);
-      }
+  async function fetchMessages() {
+    try {
+      const response = await fetch("http://localhost:5001/messages");
+      messages = await response.json();
+      renderMessages();
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+    }
+  }
+ 
+  function renderMessages() {
+    const table = document.getElementById("messagesTable");
+    const filterText = document.getElementById("filterInput").value.trim().toLowerCase();
+    const colIndex = parseInt(document.getElementById("filterColumn").value);
+    const duplicateFilter = document.getElementById("duplicateFilter").value;
+ 
+    let filtered = messages.filter(msg => {
+      if (duplicateFilter === "originals" && msg.isDuplicate) return false;
+      if (duplicateFilter === "duplicates" && !msg.isDuplicate) return false;
+      const cellValue = getCellValue(msg, colIndex).toString().trim().toLowerCase();
+      return filterText === "" || cellValue === filterText;
+    });
+ 
+    if (sortColumn !== null && sortDirection !== null) {
+      filtered.sort((a, b) => {
+        const aVal = getCellValue(a, sortColumn);
+        const bVal = getCellValue(b, sortColumn);
+ 
+        if (sortColumn === 2) {
+          return sortDirection === 'asc' ? parseFloat(aVal) - parseFloat(bVal) : parseFloat(bVal) - parseFloat(aVal);
+        }
+ 
+        if (sortColumn === 3) {
+          return sortDirection === 'asc' ? new Date(aVal) - new Date(bVal) : new Date(bVal) - new Date(aVal);
+        }
+ 
+        return sortDirection === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+      });
     }
  
-    function renderMessages() {
-      const table = document.getElementById("messagesTable");
-      const filterText = document.getElementById("filterInput").value.toLowerCase();
-      const colIndex = parseInt(document.getElementById("filterColumn").value);
-      const duplicateFilter = document.getElementById("duplicateFilter").value;
- 
-      let filtered = messages.filter(msg => {
-        if (duplicateFilter === "originals" && msg.isDuplicate) return false;
-        if (duplicateFilter === "duplicates" && !msg.isDuplicate) return false;
-        const cellValue = getCellValue(msg, colIndex).toString().toLowerCase();
-        return cellValue.includes(filterText);
-      });
- 
-      if (sortColumn !== null && sortDirection !== null) {
-        filtered.sort((a, b) => {
-          const aVal = getCellValue(a, sortColumn);
-          const bVal = getCellValue(b, sortColumn);
- 
-          if (sortColumn === 2) {
-            return sortDirection === 'asc' ? parseFloat(aVal) - parseFloat(bVal) : parseFloat(bVal) - parseFloat(aVal);
-          }
- 
-          if (sortColumn === 3) {
-            return sortDirection === 'asc' ? new Date(aVal) - new Date(bVal) : new Date(bVal) - new Date(aVal);
-          }
- 
-          return sortDirection === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
-        });
-      }
- 
-      table.innerHTML = "";
-      filtered.forEach(msg => {
-        const row = document.createElement("tr");
-        if (msg.isDuplicate) row.classList.add("highlight");
-        row.innerHTML = `
+    table.innerHTML = "";
+    filtered.forEach(msg => {
+      const row = document.createElement("tr");
+      if (msg.isDuplicate) row.classList.add("highlight");
+      row.innerHTML = `
 <td>${msg.ItemID || ""}</td>
 <td>${msg.Location || ""}</td>
 <td>${msg.Quantity || ""}</td>
 <td>${msg.TransactionDateTime || ""}</td>
 <td>${msg.TransactionNumber || ""}</td>
-        `;
-        table.appendChild(row);
-      });
+      `;
+      table.appendChild(row);
+    });
  
-      updateSortIndicators();
+    updateSortIndicators();
+  }
+ 
+  function toggleSort(col) {
+    if (sortColumn === col) {
+      sortDirection = sortDirection === 'asc' ? 'desc' : (sortDirection === 'desc' ? null : 'asc');
+      if (!sortDirection) sortColumn = null;
+    } else {
+      sortColumn = col;
+      sortDirection = 'asc';
     }
+    renderMessages();
+  }
  
-    function toggleSort(col) {
-      if (sortColumn === col) {
-        sortDirection = sortDirection === 'asc' ? 'desc' : (sortDirection === 'desc' ? null : 'asc');
-        if (!sortDirection) sortColumn = null;
-      } else {
-        sortColumn = col;
-        sortDirection = 'asc';
+  function clearSort() {
+    sortColumn = null;
+    sortDirection = null;
+    renderMessages();
+  }
+ 
+  function updateSortIndicators() {
+    const headers = document.querySelectorAll("th");
+    headers.forEach((th, idx) => {
+      th.classList.remove("sorted-asc", "sorted-desc");
+      if (idx === sortColumn) {
+        th.classList.add(sortDirection === 'asc' ? 'sorted-asc' : 'sorted-desc');
       }
-      renderMessages();
-    }
+    });
+  }
  
-    function sortByTime(order) {
-      sortColumn = 3;
-      sortDirection = order === 'newest' ? 'desc' : 'asc';
-      renderMessages();
+  function getCellValue(msg, col) {
+    switch (col) {
+      case 0: return msg.ItemID || "";
+      case 1: return msg.Location || "";
+      case 2: return msg.Quantity || "0";
+      case 3: return msg.TransactionDateTime || "";
+      case 4: return msg.TransactionNumber || "";
     }
+  }
  
-    function clearSort() {
-      sortColumn = null;
-      sortDirection = null;
-      renderMessages();
-    }
- 
-    function updateSortIndicators() {
-      const headers = document.querySelectorAll("th");
-      headers.forEach((th, idx) => {
-        th.classList.remove("sorted-asc", "sorted-desc");
-        if (idx === sortColumn) {
-          th.classList.add(sortDirection === 'asc' ? 'sorted-asc' : 'sorted-desc');
-        }
-      });
-    }
- 
-    function getCellValue(msg, col) {
-      switch (col) {
-        case 0: return msg.ItemID || "";
-        case 1: return msg.Location || "";
-        case 2: return msg.Quantity || "0";
-        case 3: return msg.TransactionDateTime || "";
-        case 4: return msg.TransactionNumber || "";
-      }
-    }
- 
-    fetchMessages();
-    setInterval(fetchMessages, 5000);
+  fetchMessages();
+  setInterval(fetchMessages, 5000);
 </script>
 </body>
 </html>
+ 
