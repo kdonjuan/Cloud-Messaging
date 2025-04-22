@@ -73,3 +73,34 @@ Traceback (most recent call last):
     raise JSONDecodeError("Expecting value", s, err.value) from None
 json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
 2025-04-21 19:36:12,598 - INFO - Subscriber is listening for messages.
+2025-04-21 20:42:58,261 - INFO - Subscriber is listening for messages.
+2025-04-21 20:57:58,313 - INFO - Re-established stream
+2025-04-21 21:12:58,350 - INFO - Re-established stream
+2025-04-21 21:19:15,082 - ERROR - Error processing message
+Traceback (most recent call last):
+  File "/Users/lane/Documents/GitHub/IS_Capstone/subscription.py", line 37, in callback
+    if not is_duplicate(message_id):
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/lane/Documents/GitHub/IS_Capstone/subscription.py", line 22, in is_duplicate
+    return cursor.fetchone()[0] > 0
+           ~~~~~~~~~~~~~~~~~^^^
+KeyError: 0
+2025-04-21 21:20:55,114 - INFO - Subscriber is listening for messages.
+2025-04-21 21:21:36,751 - ERROR - Error processing message
+Traceback (most recent call last):
+  File "/Users/lane/Documents/GitHub/IS_Capstone/subscription.py", line 37, in callback
+    if not is_duplicate(message_id):
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/lane/Documents/GitHub/IS_Capstone/subscription.py", line 22, in is_duplicate
+    return cursor.fetchone()[0] > 0
+           ~~~~~~~~~~~~~~~~~^^^
+KeyError: 0
+2025-04-21 21:22:02,266 - ERROR - Error processing message
+Traceback (most recent call last):
+  File "/Users/lane/Documents/GitHub/IS_Capstone/subscription.py", line 37, in callback
+    if not is_duplicate(message_id):
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/lane/Documents/GitHub/IS_Capstone/subscription.py", line 22, in is_duplicate
+    return cursor.fetchone()[0] > 0
+           ~~~~~~~~~~~~~~~~~^^^
+KeyError: 0

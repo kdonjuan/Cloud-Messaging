@@ -2,54 +2,52 @@ import os
 from flask import Flask, request, jsonify, render_template
 from google.cloud import pubsub_v1
 from google.oauth2 import service_account
-from config import PROJECT_ID, TOPIC_ID
+import json
 from db_config import get_db_connection
+from config import PROJECT_ID, TOPIC_ID, GOOGLE_APPLICATION_CREDENTIALS
  
-# Set up paths
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-TEMPLATE_DIR = os.path.join(BASE_DIR, "templates")
+# Set up Flask app
+app = Flask(__name__)
  
-# Initialize Flask
-app = Flask(__name__, template_folder=TEMPLATE_DIR)
+# Load service account credentials
+credentials = service_account.Credentials.from_service_account_file(GOOGLE_APPLICATION_CREDENTIALS)
  
-# Load credentials
-credentials_path = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
-credentials = service_account.Credentials.from_service_account_file(credentials_path)
- 
-# Create Pub/Sub publisher
+# Initialize the Pub/Sub publisher
 publisher = pubsub_v1.PublisherClient(credentials=credentials)
 topic_path = publisher.topic_path(PROJECT_ID, TOPIC_ID)
  
-# Serve HTML page
+# HTML form route (if using templates)
 @app.route("/", methods=["GET"])
 def home():
     return render_template("publisher.html")
  
-# Handle POST requests to publish messages
+# ✅ Fixed /publish route that accepts full message JSON
 @app.route("/publish", methods=["POST"])
 def publish_message():
     try:
-        data = request.get_json()
-        message = data.get("message")
- 
+        message = request.get_json()  # Expecting full JSON, not wrapped
         if not message:
-            return jsonify({"error": "Message is required"}), 400
+            return jsonify({"error": "Missing JSON data"}), 400
  
-        future = publisher.publish(topic_path, message.encode("utf-8"))
+        print("🔁 Received message to publish:", message)  # For debugging/logging
+ 
+        # Convert the full message to JSON bytes and publish
+        message_data = json.dumps(message).encode("utf-8")
+        future = publisher.publish(topic_path, message_data)
         message_id = future.result()
  
-        return jsonify({"message": "Message published successfully", "message_id": message_id})
+        return jsonify({"message": "Message published successfully", "message_id": message_id}), 200
  
     except Exception as e:
-        print("🔥 Error in /publish:", e)
+        print("❌ Error publishing message:", e)
         return jsonify({"error": str(e)}), 500
  
-# ✅ Handle GET requests to retrieve messages
+# /messages route to retrieve from DB for Consumer UI
 @app.route("/messages", methods=["GET"])
 def get_messages():
     try:
         conn = get_db_connection()
-        cursor = conn.cursor()  # ✅ FIXED: removed dictionary=True
+        cursor = conn.cursor()
  
         cursor.execute("""
             SELECT message_id, item_id, location, quantity, status, transaction_datetime, is_duplicate, created_at
@@ -73,9 +71,9 @@ def get_messages():
  
         return jsonify(messages), 200
     except Exception as e:
-        print("🔥 Error in /messages:", e)
+        print("❌ Error retrieving messages:", e)
         return jsonify({"error": str(e)}), 500
  
-# Run server
+# Run the Flask app
 if __name__ == "__main__":
     app.run(debug=True, port=5001)

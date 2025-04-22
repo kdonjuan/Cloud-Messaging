@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Publisher UI</title>
-  <style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Publisher UI</title>
+<style>
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Segoe UI', sans-serif;
       background: #f5ef9b;
       display: flex;
       justify-content: center;
@@ -14,6 +14,7 @@
       height: 100vh;
       margin: 0;
     }
+ 
     .container {
       background: #fff;
       padding: 2rem;
@@ -23,90 +24,94 @@
       width: 100%;
       text-align: center;
     }
+ 
     h2 {
       margin-bottom: 1.5rem;
       color: #333;
     }
-    input[type="text"], input[type="number"] {
+ 
+    input[type="text"] {
       width: 100%;
-      padding: 10px 14px;
+      padding: 10px;
       margin-bottom: 1rem;
-      border: 1px solid #ccc;
       border-radius: 8px;
+      border: 1px solid #ccc;
       font-size: 1rem;
     }
+ 
     button {
-      background-color: #007bff;
+      padding: 10px 20px;
+      background: #007bff;
       color: white;
       border: none;
-      padding: 10px 20px;
-      font-size: 1rem;
       border-radius: 8px;
+      font-size: 1rem;
       cursor: pointer;
     }
-    button:hover {
-      background-color: #0056b3;
-    }
+ 
     #status {
       margin-top: 1rem;
       font-weight: bold;
     }
-  </style>
+</style>
 </head>
 <body>
-  <div class="container">
-    <h2>Publish a Message</h2>
-    <input type="text" id="transactionNumber" placeholder="Transaction Number" />
-    <input type="text" id="itemId" placeholder="Item ID" />
-    <input type="text" id="location" placeholder="Location" />
-    <input type="number" id="quantity" placeholder="Quantity" />
-    <input type="text" id="statusField" placeholder="Status" />
-    <button id="publish">Publish</button>
-    <p id="status"></p>
-  </div>
-
+<div class="container">
+<h2>Publish a Message</h2>
+<input type="text" id="itemId" placeholder="Item ID">
+<input type="text" id="location" placeholder="Location">
+<input type="text" id="quantity" placeholder="Quantity">
+<input type="text" id="status" placeholder="Status">
+<input type="text" id="datetime" placeholder="Transaction DateTime (ISO)">
+<button onclick="publish()">Publish</button>
+<p id="status"></p>
+</div>
+ 
   <script>
-    document.getElementById("publish").addEventListener("click", async function () {
-      const transactionNumber = document.getElementById("transactionNumber").value.trim();
-      const itemId = document.getElementById("itemId").value.trim();
-      const location = document.getElementById("location").value.trim();
+    async function publish() {
+      const itemId = document.getElementById("itemId").value;
+      const location = document.getElementById("location").value;
       const quantity = parseInt(document.getElementById("quantity").value);
-      const statusField = document.getElementById("statusField").value.trim();
-      const statusText = document.getElementById("status");
-
-      if (!transactionNumber || !itemId || !location || !quantity || !statusField) {
-        statusText.textContent = "Please fill out all fields.";
-        statusText.style.color = "red";
+      const statusText = document.getElementById("status").value;
+      const datetime = document.getElementById("datetime").value;
+      const statusMsg = document.getElementById("status");
+ 
+      if (!itemId || !location || !quantity || !statusText || !datetime) {
+        statusMsg.textContent = "❌ All fields are required.";
+        statusMsg.style.color = "red";
         return;
       }
-
-      const message = {
-        TransactionNumber: transactionNumber,
+ 
+      const payload = {
+        TransactionNumber: crypto.randomUUID(),
         ItemId: itemId,
         Location: location,
         Quantity: quantity,
-        Status: statusField,
-        TransactionDateTime: new Date().toISOString()
+        Status: statusText,
+        TransactionDateTime: datetime
       };
-
+ 
       try {
-        const response = await fetch("http://localhost:5001/publish", {
+        const res = await fetch("http://localhost:5001/publish", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(message)
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
         });
-
-        const result = await response.json();
-        statusText.textContent = result.status || "Message published!";
-        statusText.style.color = "green";
+ 
+        const result = await res.json();
+ 
+        if (res.ok) {
+          statusMsg.textContent = "✅ Message published!";
+          statusMsg.style.color = "green";
+        } else {
+          statusMsg.textContent = "❌ Failed: " + (result.error || "Unknown error");
+          statusMsg.style.color = "red";
+        }
       } catch (error) {
-        console.error("Error:", error);
-        statusText.textContent = "Failed to publish message.";
-        statusText.style.color = "red";
+        statusMsg.textContent = "❌ Network error";
+        statusMsg.style.color = "red";
       }
-    });
-  </script>
+    }
+</script>
 </body>
 </html>
