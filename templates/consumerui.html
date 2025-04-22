@@ -1,23 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Consumer UI</title>
-  <style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Consumer UI</title>
+<style>
     body {
       font-family: 'Arial', sans-serif;
       background-color: #f5ef9b;
       margin: 0;
       padding: 20px;
     }
-
+ 
     h2 {
       color: #333;
       text-align: center;
       margin-bottom: 20px;
     }
-
+ 
     .container {
       max-width: 1000px;
       margin: 0 auto;
@@ -26,19 +26,19 @@
       border-radius: 12px;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
-
+ 
     .filter-wrapper {
       display: flex;
       justify-content: center;
       margin-bottom: 20px;
     }
-
+ 
     .filter-box {
       position: relative;
       width: 80%;
       max-width: 400px;
     }
-
+ 
     .filter-box input {
       width: 100%;
       padding: 12px 40px 12px 40px;
@@ -48,11 +48,11 @@
       outline: none;
       transition: border 0.3s ease;
     }
-
+ 
     .filter-box input:focus {
       border-color: #4caf50;
     }
-
+ 
     .filter-box i {
       position: absolute;
       left: 12px;
@@ -61,7 +61,7 @@
       color: #888;
       pointer-events: none;
     }
-
+ 
     table {
       width: 100%;
       border-collapse: collapse;
@@ -70,107 +70,112 @@
       border-radius: 8px;
       overflow: hidden;
     }
-
+ 
     th, td {
       border: 1px solid #ddd;
       padding: 12px;
       text-align: left;
     }
-
+ 
     th {
       background-color: #94c0e4;
       color: #fff;
       cursor: pointer;
       transition: background-color 0.3s ease;
     }
-
+ 
     th:hover {
       background-color: #4c9daf;
     }
-
+ 
     tbody tr:nth-child(even) {
       background-color: #f9f9f9;
     }
-
+ 
     tbody tr:hover {
       background-color: #f1f1f1;
     }
-
+ 
     .highlight {
       background-color: #ffdddd !important;
     }
-  </style>
-
+</style>
+ 
   <!-- Font Awesome for search icon -->
-  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
-
+ 
 <body>
-  <div class="container">
-    <h2>Received Messages</h2>
-
+<div class="container">
+<h2>Received Messages</h2>
+ 
     <div class="filter-wrapper">
-      <div class="filter-box">
-        <i class="fas fa-search"></i>
-        <input type="text" id="filterInput" placeholder="Filter by Item ID" onkeyup="filterMessages()" />
-      </div>
-    </div>
-
+<div class="filter-box">
+<i class="fas fa-search"></i>
+<input type="text" id="filterInput" placeholder="Filter by Item ID" onkeyup="filterMessages()" />
+</div>
+</div>
+ 
     <table>
-      <thead>
-        <tr>
-          <th>Item ID</th>
-          <th>Location</th>
-          <th>Quantity</th>
-          <th>Transaction Date/Time</th>
-          <th>Transaction Number</th>
-        </tr>
-      </thead>
-      <tbody id="messagesTable"></tbody>
-    </table>
-  </div>
-
+<thead>
+<tr>
+<th>Item ID</th>
+<th>Location</th>
+<th>Quantity</th>
+<th>Transaction Date/Time</th>
+<th>Transaction Number</th>
+</tr>
+</thead>
+<tbody id="messagesTable"></tbody>
+</table>
+</div>
+ 
   <script>
     async function fetchMessages() {
       try {
-        const response = await fetch('/api/messages');
+        const response = await fetch('http://localhost:5001/messages');
         const messages = await response.json();
-
+ 
         const table = document.getElementById("messagesTable");
         table.innerHTML = "";
-
+ 
         messages.forEach(message => {
           const row = document.createElement("tr");
+ 
+          if (message.isDuplicate) {
+            row.classList.add("highlight");
+          }
+ 
           row.innerHTML = `
-            <td>${message.item_id || ""}</td>
-            <td>${message.location || ""}</td>
-            <td>${message.quantity || ""}</td>
-            <td>${message.transaction_time || ""}</td>
-            <td>${message.transaction_number || ""}</td>
+<td>${message.ItemID || ""}</td>
+<td>${message.Location || ""}</td>
+<td>${message.Quantity || ""}</td>
+<td>${message.TransactionDateTime || ""}</td>
+<td>${message.TransactionNumber || ""}</td>
           `;
+ 
           table.appendChild(row);
         });
-
-        filterMessages(); // Optional: reapply filter after refresh
+ 
+        filterMessages();
       } catch (error) {
         console.error("Error fetching messages:", error);
       }
     }
-
+ 
     function filterMessages() {
       const input = document.getElementById("filterInput").value.toLowerCase();
       const rows = document.getElementById("messagesTable").getElementsByTagName("tr");
-
+ 
       for (let row of rows) {
         const itemIdCell = row.cells[0];
         const text = itemIdCell?.textContent.toLowerCase() || "";
         row.style.display = text.includes(input) ? "" : "none";
       }
     }
-
-    // Fetch messages immediately and refresh every 5 seconds
+ 
     fetchMessages();
     setInterval(fetchMessages, 5000);
-  </script>
+</script>
 </body>
 </html>
