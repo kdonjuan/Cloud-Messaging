@@ -158,3 +158,52 @@ Traceback (most recent call last):
     return cursor.fetchone()[0] > 0
            ~~~~~~~~~~~~~~~~~^^^
 KeyError: 0
+ERROR:root:❌ Error processing message
+Traceback (most recent call last):
+  File "/Users/lane/Documents/GitHub/IS_Capstone/subscription.py", line 30, in callback
+    if not is_duplicate(message_id):
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/lane/Documents/GitHub/IS_Capstone/subscription.py", line 15, in is_duplicate
+    return cursor.fetchone()[0] > 0
+           ~~~~~~~~~~~~~~~~~^^^
+KeyError: 0
+ERROR:root:❌ Error processing message
+Traceback (most recent call last):
+  File "/Users/lane/Documents/GitHub/IS_Capstone/subscription.py", line 30, in callback
+    if not is_duplicate(message_id):
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/lane/Documents/GitHub/IS_Capstone/subscription.py", line 15, in is_duplicate
+    return cursor.fetchone()[0] > 0
+           ~~~~~~~~~~~~~~~~~^^^
+KeyError: 0
+ERROR:root:❌ Error processing message
+Traceback (most recent call last):
+  File "/Users/lane/Documents/GitHub/IS_Capstone/subscription.py", line 30, in callback
+    if not is_duplicate(message_id):
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/lane/Documents/GitHub/IS_Capstone/subscription.py", line 15, in is_duplicate
+    return cursor.fetchone()[0] > 0
+           ~~~~~~~~~~~~~~~~~^^^
+KeyError: 0
+ERROR:root:❌ Error processing message
+Traceback (most recent call last):
+  File "/Users/lane/Documents/GitHub/IS_Capstone/subscription.py", line 30, in callback
+    if not is_duplicate(message_id):
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/lane/Documents/GitHub/IS_Capstone/subscription.py", line 15, in is_duplicate
+    return cursor.fetchone()[0] > 0
+           ~~~~~~~~~~~~~~~~~^^^
+KeyError: 0
+ERROR:root:❌ Error processing message
+Traceback (most recent call last):
+  File "/Users/lane/Documents/GitHub/IS_Capstone/subscription.py", line 30, in callback
+    if not is_duplicate(message_id):
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/lane/Documents/GitHub/IS_Capstone/subscription.py", line 15, in is_duplicate
+    return cursor.fetchone()[0] > 0
+           ~~~~~~~~~~~~~~~~~^^^
+KeyError: 0
+INFO:google.api_core.bidi:Thread-ConsumeBidirectionalStream exiting
+INFO:google.api_core.bidi:Thread-ConsumeBidirectionalStream exiting
+INFO:google.api_core.bidi:Thread-ConsumeBidirectionalStream exiting
+INFO:google.api_core.bidi:Thread-ConsumeBidirectionalStream exiting
