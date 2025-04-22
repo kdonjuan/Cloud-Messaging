@@ -6,17 +6,23 @@ import traceback
 from db_config import get_db_connection
 from config import PROJECT_ID, SUBSCRIPTION_ID
  
-# Optional log file
+# Set up logging (optional)
 logging.basicConfig(filename='subscriber.log', level=logging.INFO)
  
+# Database connection
 conn = get_db_connection()
 cursor = conn.cursor()
  
-def is_duplicate(message_id):
-    cursor.execute("SELECT COUNT(*) AS count FROM messages WHERE message_id = %s", (message_id,))
+# ✅ Check for duplicate based on 4 fields (excluding TransactionNumber)
+def is_duplicate(item_id, location, quantity, datetime_str):
+    cursor.execute("""
+        SELECT COUNT(*) AS count FROM messages
+        WHERE item_id = %s AND location = %s AND quantity = %s AND transaction_datetime = %s
+    """, (item_id, location, quantity, datetime_str))
     result = cursor.fetchone()
-    return result["count"] if result else 0
+    return result["count"] > 0
  
+# Handle messages from Pub/Sub
 def callback(message):
     print("📥 Received a message!")
     try:
@@ -28,25 +34,30 @@ def callback(message):
             message.ack()
             return
  
-        if is_duplicate(message_id):
-            print(f"⚠️ Duplicate message skipped: {message_id}")
-            message.ack()
-            return
+        item_id = data.get("ItemId")
+        location = data.get("Location")
+        quantity = data.get("Quantity")
+        transaction_datetime = data.get("TransactionDateTime")
  
+        # ✅ Check for content-based duplicate
+        duplicate = is_duplicate(item_id, location, quantity, transaction_datetime)
+        if duplicate:
+            print(f"⚠️ Duplicate content detected for ItemID {item_id} at {transaction_datetime}")
+ 
+        # Store message
         cursor.execute("""
             INSERT INTO messages (
-                message_id, item_id, location, quantity, status,
+                message_id, item_id, location, quantity,
                 transaction_datetime, content, is_duplicate
-            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s)
         """, (
             message_id,
-            data.get("ItemId"),
-            data.get("Location"),
-            data.get("Quantity"),
-            data.get("Status"),
-            data.get("TransactionDateTime"),  # Direct from input
+            item_id,
+            location,
+            quantity,
+            transaction_datetime,
             json.dumps(data),
-            False
+            duplicate
         ))
  
         conn.commit()
@@ -58,6 +69,7 @@ def callback(message):
     finally:
         message.ack()
  
+# Start the subscriber
 subscriber = pubsub_v1.SubscriberClient()
 subscription_path = subscriber.subscription_path(PROJECT_ID, SUBSCRIPTION_ID)
 streaming_pull_future = subscriber.subscribe(subscription_path, callback=callback)
