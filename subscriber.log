@@ -213,3 +213,4 @@ INFO:google.api_core.bidi:Re-established stream
 INFO:google.api_core.bidi:Re-established stream
 INFO:google.api_core.bidi:Thread-ConsumeBidirectionalStream exiting
 INFO:google.api_core.bidi:Thread-ConsumeBidirectionalStream exiting
+INFO:google.api_core.bidi:Re-established stream
