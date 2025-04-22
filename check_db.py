@@ -1,19 +1,14 @@
 from db_config import get_db_connection
  
-try:
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM messages ORDER BY created_at DESC LIMIT 5;")
-    results = cursor.fetchall()
+conn = get_db_connection()
+cursor = conn.cursor()
+cursor.execute("SELECT * FROM messages ORDER BY created_at DESC LIMIT 5;")
+rows = cursor.fetchall()
  
-    print("📦 Recent messages in DB:")
-    for row in results:
-        print(row)
+print("📦 Latest messages:")
+for row in rows:
+    print(row)
  
-    if not results:
-        print("🚫 No messages stored in DB.")
-except Exception as e:
-    print("❌ Error checking database:", e)
-
-
+if not rows:
+    print("⚠️ No messages stored.")
     

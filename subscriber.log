@@ -104,3 +104,57 @@ Traceback (most recent call last):
     return cursor.fetchone()[0] > 0
            ~~~~~~~~~~~~~~~~~^^^
 KeyError: 0
+2025-04-21 21:23:20,618 - ERROR - Error processing message
+Traceback (most recent call last):
+  File "/Users/lane/Documents/GitHub/IS_Capstone/subscription.py", line 37, in callback
+    if not is_duplicate(message_id):
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/lane/Documents/GitHub/IS_Capstone/subscription.py", line 22, in is_duplicate
+    return cursor.fetchone()[0] > 0
+           ~~~~~~~~~~~~~~~~~^^^
+KeyError: 0
+2025-04-21 21:24:51,512 - ERROR - Error processing message
+Traceback (most recent call last):
+  File "/Users/lane/Documents/GitHub/IS_Capstone/subscription.py", line 37, in callback
+    if not is_duplicate(message_id):
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/lane/Documents/GitHub/IS_Capstone/subscription.py", line 22, in is_duplicate
+    return cursor.fetchone()[0] > 0
+           ~~~~~~~~~~~~~~~~~^^^
+KeyError: 0
+2025-04-21 21:25:06,528 - ERROR - Error processing message
+Traceback (most recent call last):
+  File "/Users/lane/Documents/GitHub/IS_Capstone/subscription.py", line 37, in callback
+    if not is_duplicate(message_id):
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/lane/Documents/GitHub/IS_Capstone/subscription.py", line 22, in is_duplicate
+    return cursor.fetchone()[0] > 0
+           ~~~~~~~~~~~~~~~~~^^^
+KeyError: 0
+2025-04-21 21:27:36,808 - ERROR - Error processing message
+Traceback (most recent call last):
+  File "/Users/lane/Documents/GitHub/IS_Capstone/subscription.py", line 37, in callback
+    if not is_duplicate(message_id):
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/lane/Documents/GitHub/IS_Capstone/subscription.py", line 22, in is_duplicate
+    return cursor.fetchone()[0] > 0
+           ~~~~~~~~~~~~~~~~~^^^
+KeyError: 0
+2025-04-21 21:35:55,161 - INFO - Re-established stream
+2025-04-21 21:39:27,381 - ERROR - Error processing message
+Traceback (most recent call last):
+  File "/Users/lane/Documents/GitHub/IS_Capstone/subscription.py", line 37, in callback
+    data.get("Location"),
+  File "/Users/lane/Documents/GitHub/IS_Capstone/subscription.py", line 22, in is_duplicate
+    status = data.get("Status", "UNKNOWN")
+       ^^^^^^^^^^^^^^^^^^^^
+KeyError: 0
+ERROR:root:❌ Error processing message
+Traceback (most recent call last):
+  File "/Users/lane/Documents/GitHub/IS_Capstone/subscription.py", line 30, in callback
+    if not is_duplicate(message_id):
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/lane/Documents/GitHub/IS_Capstone/subscription.py", line 15, in is_duplicate
+    return cursor.fetchone()[0] > 0
+           ~~~~~~~~~~~~~~~~~^^^
+KeyError: 0

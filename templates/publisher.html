@@ -4,112 +4,44 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Publisher UI</title>
-<style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f5ef9b;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
- 
-    .container {
-      background: #fff;
-      padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-      max-width: 400px;
-      width: 100%;
-      text-align: center;
-    }
- 
-    h2 {
-      margin-bottom: 1.5rem;
-      color: #333;
-    }
- 
-    input[type="text"] {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 1rem;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-size: 1rem;
-    }
- 
-    button {
-      padding: 10px 20px;
-      background: #007bff;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      cursor: pointer;
-    }
- 
-    #status {
-      margin-top: 1rem;
-      font-weight: bold;
-    }
-</style>
 </head>
 <body>
 <div class="container">
 <h2>Publish a Message</h2>
-<input type="text" id="itemId" placeholder="Item ID">
-<input type="text" id="location" placeholder="Location">
-<input type="text" id="quantity" placeholder="Quantity">
-<input type="text" id="status" placeholder="Status">
-<input type="text" id="datetime" placeholder="Transaction DateTime (ISO)">
+<input type="text" id="itemId" placeholder="Item ID"><br>
+<input type="text" id="location" placeholder="Location"><br>
+<input type="text" id="quantity" placeholder="Quantity"><br>
+<input type="text" id="status" placeholder="Status"><br>
+<input type="text" id="datetime" placeholder="Transaction DateTime (ISO)"><br>
 <button onclick="publish()">Publish</button>
-<p id="status"></p>
+<p id="statusText"></p>
 </div>
  
   <script>
     async function publish() {
-      const itemId = document.getElementById("itemId").value;
-      const location = document.getElementById("location").value;
-      const quantity = parseInt(document.getElementById("quantity").value);
-      const statusText = document.getElementById("status").value;
-      const datetime = document.getElementById("datetime").value;
-      const statusMsg = document.getElementById("status");
- 
-      if (!itemId || !location || !quantity || !statusText || !datetime) {
-        statusMsg.textContent = "❌ All fields are required.";
-        statusMsg.style.color = "red";
-        return;
-      }
- 
-      const payload = {
+      const message = {
         TransactionNumber: crypto.randomUUID(),
-        ItemId: itemId,
-        Location: location,
-        Quantity: quantity,
-        Status: statusText,
-        TransactionDateTime: datetime
+        ItemId: document.getElementById("itemId").value,
+        Location: document.getElementById("location").value,
+        Quantity: parseInt(document.getElementById("quantity").value),
+        Status: document.getElementById("status").value,
+        TransactionDateTime: document.getElementById("datetime").value
       };
  
-      try {
-        const res = await fetch("http://localhost:5001/publish", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
+      const response = await fetch("http://localhost:5001/publish", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(message)
+      });
  
-        const result = await res.json();
- 
-        if (res.ok) {
-          statusMsg.textContent = "✅ Message published!";
-          statusMsg.style.color = "green";
-        } else {
-          statusMsg.textContent = "❌ Failed: " + (result.error || "Unknown error");
-          statusMsg.style.color = "red";
-        }
-      } catch (error) {
-        statusMsg.textContent = "❌ Network error";
-        statusMsg.style.color = "red";
+      const status = document.getElementById("statusText");
+      if (response.ok) {
+        status.textContent = "✅ Message published!";
+        status.style.color = "green";
+      } else {
+        const result = await response.json();
+        status.textContent = "❌ " + (result.error || "Unknown error");
+        status.style.color = "red";
       }
     }
 </script>
