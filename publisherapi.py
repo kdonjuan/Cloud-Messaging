@@ -73,7 +73,23 @@ def get_messages():
         print("❌ Error retrieving messages:", e)
         return jsonify({"error": str(e)}), 500
  
+# ✅ DELETE route to remove a message from the database
+@app.route("/delete-message/<message_id>", methods=["DELETE"])
+def delete_message(message_id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM messages WHERE message_id = %s", (message_id,))
+        conn.commit()
+ 
+        if cursor.rowcount == 0:
+            return jsonify({"error": "Message not found"}), 404
+ 
+        return jsonify({"message": "Message deleted successfully"}), 200
+    except Exception as e:
+        print("❌ Error deleting message:", e)
+        return jsonify({"error": str(e)}), 500
+ 
 # ✅ Run the Flask app
 if __name__ == "__main__":
     app.run(debug=True, port=5001)
-    

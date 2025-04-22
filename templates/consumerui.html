@@ -37,13 +37,7 @@
       flex-wrap: wrap;
     }
  
-    .filter-box input,
-    .filter-box select,
-    .filter-box button,
-    #filterInput,
-    #filterColumn,
-    #duplicateFilter,
-    button {
+    #filterInput, #filterColumn, #duplicateFilter, button {
       padding: 10px;
       border-radius: 6px;
       border: 1px solid #ccc;
@@ -144,6 +138,7 @@
 <th onclick="toggleSort(2)">Quantity</th>
 <th onclick="toggleSort(3)">Transaction Date/Time</th>
 <th onclick="toggleSort(4)">Transaction Number</th>
+<th>Actions</th>
 </tr>
 </thead>
 <tbody id="messagesTable"></tbody>
@@ -183,15 +178,12 @@
         const aVal = getCellValue(a, sortColumn);
         const bVal = getCellValue(b, sortColumn);
  
-        // 🔧 Fix sorting for ItemID: sort by the number after "ITEM-"
         if (sortColumn === 0) {
           const getNumber = val => {
             const match = val.match(/-(\d+)/);
             return match ? parseInt(match[1]) : 0;
           };
-          return sortDirection === 'asc'
-            ? getNumber(aVal) - getNumber(bVal)
-            : getNumber(bVal) - getNumber(aVal);
+          return sortDirection === 'asc' ? getNumber(aVal) - getNumber(bVal) : getNumber(bVal) - getNumber(aVal);
         }
  
         if (sortColumn === 2) {
@@ -216,6 +208,7 @@
 <td>${msg.Quantity || ""}</td>
 <td>${msg.TransactionDateTime || ""}</td>
 <td>${msg.TransactionNumber || ""}</td>
+<td><button onclick="confirmDelete('${msg.TransactionNumber}')">Delete</button></td>
       `;
       table.appendChild(row);
     });
@@ -257,6 +250,20 @@
       case 2: return msg.Quantity || "0";
       case 3: return msg.TransactionDateTime || "";
       case 4: return msg.TransactionNumber || "";
+    }
+  }
+ 
+  function confirmDelete(transactionNumber) {
+    if (confirm("Are you sure you want to delete this message?")) {
+      fetch(`http://localhost:5001/delete-message/${transactionNumber}`, {
+        method: "DELETE"
+      })
+      .then(response => {
+        if (!response.ok) throw new Error("Failed to delete.");
+        messages = messages.filter(msg => msg.TransactionNumber !== transactionNumber);
+        renderMessages();
+      })
+      .catch(error => alert("Error deleting message: " + error));
     }
   }
  
