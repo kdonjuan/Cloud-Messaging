@@ -5,42 +5,114 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Publisher UI</title>
 </head>
-<body>
-<div class="container">
+<body style="background-color: #ffffe0; font-family: Arial, sans-serif; padding: 40px;">
 <h2>Publish a Message</h2>
-<input type="text" id="itemId" placeholder="Item ID"><br>
-<input type="text" id="location" placeholder="Location"><br>
-<input type="text" id="quantity" placeholder="Quantity"><br>
-<input type="text" id="status" placeholder="Status"><br>
-<input type="text" id="datetime" placeholder="Transaction DateTime (ISO)"><br>
-<button onclick="publish()">Publish</button>
-<p id="statusText"></p>
-</div>
+ 
+  <label>Item ID:</label><br>
+<input type="text" id="itemId"><br><br>
+ 
+  <label>Location:</label><br>
+<input type="text" id="location"><br><br>
+ 
+  <label>Quantity:</label><br>
+<input type="number" id="quantity"><br><br>
+ 
+  <label>Transaction DateTime (YYYY-MM-DD HH:MM:SS):</label><br>
+<input type="text" id="datetime"><br><br>
+ 
+  <button onclick="publish()">Publish</button>
+<p id="statusText" style="font-weight: bold;"></p>
  
   <script>
+    function isValidDatetimeFormat(value) {
+      const regex = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
+      return regex.test(value);
+    }
+ 
+    function validateInputs() {
+      let isValid = true;
+      const status = document.getElementById("statusText");
+      status.textContent = "";
+ 
+      const fields = ["itemId", "location", "quantity", "datetime"];
+      fields.forEach(id => document.getElementById(id).style.border = "1px solid #ccc");
+ 
+      fields.forEach(id => {
+        const field = document.getElementById(id);
+        if (!field.value.trim()) {
+          field.style.border = "2px solid red";
+          isValid = false;
+        }
+      });
+ 
+      if (!isValid) {
+        status.textContent = "❌ Please fill out all fields.";
+        status.style.color = "red";
+        return false;
+      }
+ 
+      const quantity = document.getElementById("quantity").value;
+      if (isNaN(quantity) || parseInt(quantity) < 0) {
+        document.getElementById("quantity").style.border = "2px solid red";
+        status.textContent = "❌ Quantity must be a non-negative number.";
+        status.style.color = "red";
+        return false;
+      }
+ 
+      const datetime = document.getElementById("datetime").value;
+      if (!isValidDatetimeFormat(datetime)) {
+        document.getElementById("datetime").style.border = "2px solid red";
+        status.textContent = "❌ Invalid datetime format. Use YYYY-MM-DD HH:MM:SS";
+        status.style.color = "red";
+        return false;
+      }
+ 
+      return true;
+    }
+ 
+    function clearForm() {
+      const fields = ["itemId", "location", "quantity", "datetime"];
+      fields.forEach(id => {
+        document.getElementById(id).value = "";
+        document.getElementById(id).style.border = "1px solid #ccc";
+      });
+    }
+ 
     async function publish() {
+      const status = document.getElementById("statusText");
+ 
+      if (!validateInputs()) return;
+ 
+      status.textContent = "⏳ Publishing...";
+      status.style.color = "gray";
+ 
       const message = {
         TransactionNumber: crypto.randomUUID(),
         ItemId: document.getElementById("itemId").value,
         Location: document.getElementById("location").value,
         Quantity: parseInt(document.getElementById("quantity").value),
-        Status: document.getElementById("status").value,
         TransactionDateTime: document.getElementById("datetime").value
       };
  
-      const response = await fetch("http://localhost:5001/publish", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(message)
-      });
+      try {
+        const response = await fetch("http://localhost:5001/publish", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(message)
+        });
  
-      const status = document.getElementById("statusText");
-      if (response.ok) {
-        status.textContent = "✅ Message published!";
-        status.style.color = "green";
-      } else {
-        const result = await response.json();
-        status.textContent = "❌ " + (result.error || "Unknown error");
+        if (response.ok) {
+          const result = await response.json();
+          status.textContent = "✅ Message published!";
+          status.style.color = "green";
+          clearForm();  // ✅ Auto-clear form on success
+        } else {
+          const result = await response.json();
+          status.textContent = "❌ Error: " + (result.error || "Unknown error");
+          status.style.color = "red";
+        }
+      } catch (err) {
+        status.textContent = "❌ Network error: " + err.message;
         status.style.color = "red";
       }
     }
