@@ -4,16 +4,17 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Consumer UI</title>
+<link href="https://fonts.googleapis.com/css2?family=Helvetica+Neue:wght@400;700&display=swap" rel="stylesheet">
 <style>
     body {
-      font-family: 'Arial', sans-serif;
-      background-color: #2e67e2;
+      font-family: 'Helvetica Neue', sans-serif;
+      background-color: #f2f2f2;
       margin: 0;
       padding: 20px;
+      color: #1a1a1a;
     }
  
     h2 {
-      color: #333;
       text-align: center;
       margin-bottom: 20px;
     }
@@ -21,44 +22,54 @@
     .container {
       max-width: 1000px;
       margin: 0 auto;
-      background-color: #fff;
-      padding: 20px;
+      background-color: #ffffff;
+      padding: 24px;
       border-radius: 12px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
     }
  
     .filter-wrapper {
       display: flex;
-      justify-content: center;
+      justify-content: space-between;
       align-items: center;
       gap: 10px;
       margin-bottom: 20px;
-    }
- 
-    .filter-box {
-      position: relative;
-      width: 60%;
+      flex-wrap: wrap;
     }
  
     .filter-box input,
-    .filter-box select {
+    .filter-box select,
+    .filter-box button,
+    #filterInput,
+    #filterColumn,
+    #duplicateFilter,
+    button {
       padding: 10px;
-      border-radius: 8px;
+      border-radius: 6px;
       border: 1px solid #ccc;
       font-size: 14px;
+      background-color: #fff;
+      color: #1a1a1a;
     }
  
-    .filter-box input {
-      width: 100%;
+    button {
+      background-color: #1e6ba8;
+      color: #fff;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+ 
+    button:hover {
+      background-color: #155b8d;
     }
  
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 20px;
-      background-color: #fff;
       border-radius: 8px;
       overflow: hidden;
+      background-color: #fff;
     }
  
     th, td {
@@ -68,8 +79,23 @@
     }
  
     th {
-      background-color: #94c0e4;
-      color: #fff;
+      background-color: #1e6ba8;
+      color: #ffffff;
+      font-weight: bold;
+      cursor: pointer;
+      position: relative;
+    }
+ 
+    th.sorted-asc::after {
+      content: " ▲";
+      position: absolute;
+      right: 10px;
+    }
+ 
+    th.sorted-desc::after {
+      content: " ▼";
+      position: absolute;
+      right: 10px;
     }
  
     tbody tr:nth-child(even) {
@@ -77,7 +103,7 @@
     }
  
     tbody tr:hover {
-      background-color: #f1f1f1;
+      background-color: #e6f0fa;
     }
  
     .highlight {
@@ -91,28 +117,35 @@
 <h2>Received Messages</h2>
  
     <div class="filter-wrapper">
-<div class="filter-box">
-<select id="filterColumn" onchange="filterMessages()">
+<select id="filterColumn" onchange="renderMessages()">
 <option value="0">Item ID</option>
 <option value="1">Location</option>
 <option value="2">Quantity</option>
 <option value="3">Transaction Date/Time</option>
 <option value="4">Transaction Number</option>
 </select>
-</div>
-<div class="filter-box">
-<input type="text" id="filterInput" placeholder="Type to filter..." onkeyup="filterMessages()" />
-</div>
+ 
+      <input type="text" id="filterInput" placeholder="Type to filter..." onkeyup="renderMessages()" />
+ 
+      <select id="duplicateFilter" onchange="renderMessages()">
+<option value="all">Show All</option>
+<option value="originals">Only Originals</option>
+<option value="duplicates">Only Duplicates</option>
+</select>
+ 
+      <button onclick="sortByTime('newest')">Newest First</button>
+<button onclick="sortByTime('oldest')">Oldest First</button>
+<button onclick="clearSort()">Clear Sort</button>
 </div>
  
     <table>
 <thead>
 <tr>
-<th>Item ID</th>
-<th>Location</th>
-<th>Quantity</th>
-<th>Transaction Date/Time</th>
-<th>Transaction Number</th>
+<th onclick="toggleSort(0)">Item ID</th>
+<th onclick="toggleSort(1)">Location</th>
+<th onclick="toggleSort(2)">Quantity</th>
+<th onclick="toggleSort(3)">Transaction Date/Time</th>
+<th onclick="toggleSort(4)">Transaction Number</th>
 </tr>
 </thead>
 <tbody id="messagesTable"></tbody>
@@ -121,13 +154,14 @@
  
   <script>
     let messages = [];
+    let sortColumn = null;
+    let sortDirection = null;
  
     async function fetchMessages() {
       try {
         const response = await fetch("http://localhost:5001/messages");
         messages = await response.json();
         renderMessages();
-        filterMessages(); // Apply filters after data loads
       } catch (error) {
         console.error("Error fetching messages:", error);
       }
@@ -135,33 +169,91 @@
  
     function renderMessages() {
       const table = document.getElementById("messagesTable");
-      table.innerHTML = "";
+      const filterText = document.getElementById("filterInput").value.toLowerCase();
+      const colIndex = parseInt(document.getElementById("filterColumn").value);
+      const duplicateFilter = document.getElementById("duplicateFilter").value;
  
-      messages.forEach(message => {
+      let filtered = messages.filter(msg => {
+        if (duplicateFilter === "originals" && msg.isDuplicate) return false;
+        if (duplicateFilter === "duplicates" && !msg.isDuplicate) return false;
+        const cellValue = getCellValue(msg, colIndex).toString().toLowerCase();
+        return cellValue.includes(filterText);
+      });
+ 
+      if (sortColumn !== null && sortDirection !== null) {
+        filtered.sort((a, b) => {
+          const aVal = getCellValue(a, sortColumn);
+          const bVal = getCellValue(b, sortColumn);
+ 
+          if (sortColumn === 2) {
+            return sortDirection === 'asc' ? parseFloat(aVal) - parseFloat(bVal) : parseFloat(bVal) - parseFloat(aVal);
+          }
+ 
+          if (sortColumn === 3) {
+            return sortDirection === 'asc' ? new Date(aVal) - new Date(bVal) : new Date(bVal) - new Date(aVal);
+          }
+ 
+          return sortDirection === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+        });
+      }
+ 
+      table.innerHTML = "";
+      filtered.forEach(msg => {
         const row = document.createElement("tr");
-        if (message.isDuplicate) {
-          row.classList.add("highlight");
-        }
+        if (msg.isDuplicate) row.classList.add("highlight");
         row.innerHTML = `
-<td>${message.ItemID || ""}</td>
-<td>${message.Location || ""}</td>
-<td>${message.Quantity || ""}</td>
-<td>${message.TransactionDateTime || ""}</td>
-<td>${message.TransactionNumber || ""}</td>
+<td>${msg.ItemID || ""}</td>
+<td>${msg.Location || ""}</td>
+<td>${msg.Quantity || ""}</td>
+<td>${msg.TransactionDateTime || ""}</td>
+<td>${msg.TransactionNumber || ""}</td>
         `;
         table.appendChild(row);
       });
+ 
+      updateSortIndicators();
     }
  
-    function filterMessages() {
-      const filterText = document.getElementById("filterInput").value.toLowerCase();
-      const selectedColumn = parseInt(document.getElementById("filterColumn").value);
-      const rows = document.getElementById("messagesTable").getElementsByTagName("tr");
+    function toggleSort(col) {
+      if (sortColumn === col) {
+        sortDirection = sortDirection === 'asc' ? 'desc' : (sortDirection === 'desc' ? null : 'asc');
+        if (!sortDirection) sortColumn = null;
+      } else {
+        sortColumn = col;
+        sortDirection = 'asc';
+      }
+      renderMessages();
+    }
  
-      for (let row of rows) {
-        const cell = row.cells[selectedColumn];
-        const text = cell?.textContent.toLowerCase() || "";
-        row.style.display = text.includes(filterText) ? "" : "none";
+    function sortByTime(order) {
+      sortColumn = 3;
+      sortDirection = order === 'newest' ? 'desc' : 'asc';
+      renderMessages();
+    }
+ 
+    function clearSort() {
+      sortColumn = null;
+      sortDirection = null;
+      renderMessages();
+    }
+ 
+    function updateSortIndicators() {
+      const headers = document.querySelectorAll("th");
+      headers.forEach((th, idx) => {
+        th.classList.remove("sorted-asc", "sorted-desc");
+        if (idx === sortColumn) {
+          th.classList.add(sortDirection === 'asc' ? 'sorted-asc' : 'sorted-desc');
+        }
+      });
+    }
+ 
+    function getCellValue(msg, col) {
+      switch (col) {
+        case 0: return msg.ItemID || "";
+        case 1: return msg.Location || "";
+        case 2: return msg.Quantity || "0";
+        case 3: return msg.TransactionDateTime || "";
+        case 4: return msg.TransactionNumber || "";
       }
     }
  
